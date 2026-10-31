@@ -4,6 +4,12 @@ The **backend** of MERNCAMP, a **social network built by devs for devs**, built 
 
 ---
 
+## 📸 Screenshots
+
+This is the backend of MERNCAMP — it has no UI of its own. See it in action in the [merncamp-client screenshots](https://github.com/alijamshidy/merncamp-client#-screenshots).
+
+---
+
 ## ✨ Features
 
 ### 🔐 **Authentication**
