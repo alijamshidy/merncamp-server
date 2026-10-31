@@ -4,15 +4,10 @@ The **backend** of MERNCAMP, a **social network built by devs for devs**, built 
 
 ---
 
-## 📸 Screenshot
-*(Add your screenshots here - API responses, database schema, etc.)*
-
----
-
 ## ✨ Features
 
 ### 🔐 **Authentication**
-- User registration with email, username, and password (**bcrypt**, salt rounds: 12)
+- User registration with email and password (**bcrypt**, salt rounds: 12) — a unique `username` is auto-generated (nanoid) and can be changed later via profile update
 - Login with **JWT** (HS256) token issuance
 - Token verification middleware via **express-jwt**
 - Password recovery using a personal **secret question** answer
@@ -43,7 +38,7 @@ The **backend** of MERNCAMP, a **social network built by devs for devs**, built 
 - Password hashing — plain passwords are never stored
 
 ### ⚡ **Real-time**
-- **Socket.IO** server broadcasting `new-post` events to all connected clients
+- **Socket.IO** server relaying `new-post` events to all connected clients **except the sender** (the client emits `new-post` after creating a post)
 
 ### 🧩 **Auto-loaded Routes**
 - Any file dropped in `routes/` is automatically mounted under `/api` — zero registration boilerplate
@@ -129,9 +124,6 @@ PORT=8000
 # MongoDB connection string (local or Atlas)
 DB_URL=mongodb://localhost:27017/merncamp
 
-# Secret question answer verification (used for password recovery)
-SECRET=your_secret_answer
-
 # JWT signing secret
 JWT_SECRET=your_jwt_secret_here
 
@@ -143,6 +135,8 @@ CLOUDINARY_SECRET=your_cloudinary_api_secret
 # Frontend URL (CORS + Socket.IO origin)
 CLIENT_URL=http://localhost:3000
 ```
+
+> ℹ️ The **secret question** answer used for password recovery is a per-user field stored in MongoDB (set at registration), **not** an environment variable.
 
 ---
 
@@ -191,14 +185,21 @@ npm start
 | PUT | `/api/user-unfollow` | Unfollow a user | ✅ |
 | GET | `/api/search-user/:query` | Search users | ❌ |
 | GET | `/api/user/:username` | Public profile | ❌ |
+| GET | `/api/user-following` | List of users you follow | ✅ |
+| GET | `/api/current-admin` | Check admin role | ✅ Admin |
 | POST | `/api/create-post` | Create a post | ✅ |
 | POST | `/api/upload-image` | Upload post image (≤5 MB) | ✅ |
-| GET | `/api/news-feed/:page` | Paginated news feed | ✅ |
+| GET | `/api/get-posts` | Latest 10 posts | ✅ |
+| GET | `/api/news-feed/:page` | Paginated news feed (3 per page) | ✅ |
+| GET | `/api/user-post/:_id` | Posts by a user | ✅ |
+| PUT | `/api/update-post/:_id` | Update a post (author only) | ✅ |
+| DELETE | `/api/delete-post/:_id` | Delete a post (author only) | ✅ |
 | PUT | `/api/like-post` | Like a post | ✅ |
 | PUT | `/api/unlike-post` | Unlike a post | ✅ |
 | PUT | `/api/add-comment` | Comment on a post | ✅ |
 | PUT | `/api/remove-comment` | Remove a comment | ✅ |
 | GET | `/api/post/:_id` | Post details | ❌ |
+| GET | `/api/posts` | Public post listing | ❌ |
 | GET | `/api/total-post-count` | Total posts count | ❌ |
 | DELETE | `/api/admin/delete-post/:_id` | Delete any post (admin) | ✅ Admin |
 
@@ -206,7 +207,7 @@ npm start
 ```bash
 curl -X POST http://localhost:8000/api/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"John","email":"john@example.com","password":"secret123","username":"john","secret":"my answer"}'
+  -d '{"name":"John","email":"john@example.com","password":"secret123","secret":"my answer"}'
 ```
 
 ---
